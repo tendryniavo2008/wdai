@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>WorldAI - Premium Interface</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        /* Force la hauteur dynamique pour éviter que le haut ou le bas soit coupé */
+        .app-container {
+            height: 100vh;
+            height: 100dvh;
+        }
+        
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+        @media (min-width: 768px) {
+            .glass-panel {
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            }
+        }
+        .glass-input {
+            background: rgba(15, 23, 42, 0.86);
+            border: 1px solid rgba(59, 130, 246, 0.25);
+        }
+        .glass-input:focus-within {
+            border-color: rgba(59, 130, 246, 0.6);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="app-container w-screen overflow-hidden flex items-center justify-center font-sans bg-cover bg-center" 
+      style="background-image: url('https://images.unsplash.com/photo-1519501025264-65ba15a82390?q=80&w=1600&auto=format&fit=crop');">
+
+    <div class="w-full h-full md:max-w-6xl md:h-[88vh] md:rounded-3xl glass-panel flex flex-col overflow-hidden relative shadow-2xl transition-all duration-300">
+        
+        <header class="w-full p-4 flex justify-between items-center border-b border-white/5 bg-slate-950/40 shrink-0">
+            <div class="flex items-center gap-2">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center text-white font-black text-base shadow-lg shadow-blue-500/30">
+                    W
+                </div>
+                <h1 class="text-xl font-bold tracking-wide text-white">World<span class="text-blue-400">AI</span></h1>
+            </div>
+
+            <div class="flex items-center gap-2 relative">
+                <div class="font-mono bg-slate-950/60 px-2.5 py-1.5 rounded-xl text-sm font-bold tracking-wider text-cyan-400 border border-white/5 flex items-center gap-1.5 shadow-inner">
+                    <span id="clock">00:00:00</span>
+                    <span id="timezone-badge" class="text-[10px] text-slate-400 font-sans font-medium"></span>
+                </div>
+
+                <button id="profile-menu-btn" class="p-2 rounded-xl bg-slate-900/60 hover:bg-slate-800/80 border border-white/5 text-white transition flex items-center gap-2">
+                    <span id="theme-icon">☀️</span>
+                    <div class="w-5 h-5 rounded-full bg-slate-600 flex items-center justify-center text-[10px]">👤</div>
+                </button>
+
+                <div id="auth-dropdown" class="hidden absolute right-0 top-14 w-64 glass-panel rounded-2xl p-4 z-50 border border-white/10 flex flex-col gap-3 shadow-2xl">
+                    <div class="flex items-center gap-3 border-b border-white/5 pb-2">
+                        <div class="w-9 h-9 rounded-full bg-slate-700 flex items-center justify-center text-white text-sm">👤</div>
+                        <div>
+                            <p class="text-sm font-semibold text-white">Utilisateur</p>
+                            <p id="user-gmt" class="text-xs text-slate-400"></p>
+                        </div>
+                    </div>
+                    <button class="w-full py-2 px-4 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-white text-sm font-medium transition border border-white/5">
+                        Mode Anonyme
+                    </button>
+                    <button class="w-full py-2 px-4 rounded-xl bg-white hover:bg-slate-100 text-slate-900 text-sm font-semibold transition flex items-center justify-center gap-2 shadow-md">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 5.04c1.64 0 3.12.56 4.28 1.67l3.2-3.2C17.52 1.58 14.94 1 12 1 7.35 1 3.4 3.65 1.5 7.5l3.6 2.8C6.01 6.84 8.74 5.04 12 5.04z"/><path fill="#4285F4" d="M23.49 12.27c0-.81-.07-1.59-.2-2.36H12v4.51h6.46c-.29 1.48-1.14 2.73-2.4 3.58l3.6 2.8c2.1-1.94 3.83-4.8 3.83-8.53z"/><path fill="#FBBC05" d="M5.1 14.7c-.25-.76-.39-1.57-.39-2.4s.14-1.64.39-2.4L1.5 7.1C.54 9.03 0 11.24 0 13.6s.54 4.57 1.5 6.5l3.6-2.8z"/><path fill="#34A853" d="M12 23c3.24 0 5.97-1.08 7.96-2.91l-3.6-2.8c-1.1.74-2.52 1.18-4.36 1.18-3.26 0-5.99-1.8-6.99-4.26l-3.6 2.8C3.4 20.35 7.35 23 12 23z"/></svg>
+                        Se connecter avec Google
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar bg-slate-950/10">
+            <div class="flex gap-3 items-start max-w-[85%]">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 flex-shrink-0 flex items-center justify-center text-white text-xs font-bold shadow-md">W</div>
+                <div class="bg-slate-900/50 border border-white/5 rounded-2xl rounded-tl-none p-3.5 shadow-xl">
+                    <p class="text-sm text-slate-100 leading-relaxed">Bonjour ! Je suis <span class="text-blue-400 font-semibold">WorldAI</span>. Comment puis-je vous aider aujourd'hui ? Vous pouvez m'envoyer du texte ou une photo.</p>
+                    <div class="flex items-center justify-end gap-1.5 mt-2 text-[10px] text-slate-400">
+                        <span id="welcome-time">15:17</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="p-3 bg-slate-950/60 border-t border-white/5 shrink-0">
+            <div class="max-w-4xl mx-auto glass-input rounded-xl p-1.5 flex items-center gap-1.5">
+                <label for="image-input" class="p-2 rounded-lg hover:bg-white/10 text-slate-300 cursor-pointer transition-colors shrink-0">
+                    📷
+                    <input type="file" id="image-input" accept="image/*" class="hidden">
+                </label>
+                <button class="p-2 rounded-lg hover:bg-white/10 text-slate-300 transition-colors shrink-0">
+                    📎
+                </button>
+                <input type="text" id="user-input" placeholder="Message ou photo..." class="flex-1 bg-transparent outline-none text-sm text-white placeholder-slate-400 py-1 px-1 min-w-0">
+                <button id="send-btn" class="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-semibold text-xs px-4 py-2 rounded-lg shadow-lg shadow-blue-500/20 transition-all active:scale-95 shrink-0">
+                    Envoyer
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { 
+    getAuth, 
+    signInWithPopup, 
+    GoogleAuthProvider, 
+    signInAnonymously, 
+    signOut, 
+    onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+// 1. IMPORTATION DE FIRESTORE
+import { 
+    getFirestore, 
+    collection, 
+    addDoc, 
+    getDocs, 
+    query, 
+    orderBy 
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+// Vos clés Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyA_VpLJo845TJP4XoTKui1YFRxkuslWFk",
+    authDomain: "worldai-4ec87.firebaseapp.com",
+    projectId: "worldai-4ec87",
+    storageBucket: "worldai-4ec87.firebasestorage.app",
+    messagingSenderId: "887481305222",
+    appId: "1:887481305222:web:a2812f079857735a91a907",
+    measurementId: "G-P5Q64DL1QJ"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
+// Initialisation de la base de données Firestore
+const db = getFirestore(app);
+
+const btnGoogle = document.querySelector('#auth-dropdown button:nth-of-type(2)');
+const btnAnon = document.querySelector('#auth-dropdown button:nth-of-type(1)');
+const userGmtElement = document.getElementById('user-gmt');
+
+let currentUser = null; // Stocke l'utilisateur connecté
+
+// Observer l'état de connexion et charger l'historique
+onAuthStateChanged(auth, async (user) => {
+    const pPhoto = document.querySelector('#profile-menu-btn div');
+    if (user) {
+        currentUser = user; // Sauvegarde de la session de l'user
+        
+        if (user.isAnonymous) {
+            userGmtElement.innerHTML = `<span class="text-amber-400">Mode Anonyme</span><br><span class="text-[10px] text-slate-400">${userGmtString}</span>`;
+            pPhoto.textContent = "👤"; pPhoto.style.backgroundImage = "none";
+            btnAnon.textContent = "Se déconnecter"; btnGoogle.style.display = "none";
+        } else {
+            userGmtElement.innerHTML = `<span class="text-blue-400 font-medium">${user.displayName}</span><br><span class="text-[10px] text-slate-400">${userGmtString}</span>`;
+            if(user.photoURL) { pPhoto.textContent = ""; pPhoto.style.backgroundImage = `url('${user.photoURL}')`; pPhoto.style.backgroundSize = "cover"; }
+            btnGoogle.innerHTML = "Se déconnecter"; btnAnon.style.display = "none";
+        }
+        
+        // CHARGEMENT DE L'HISTORIQUE DEPUIS FIRESTORE UNE FOIS CONNECTÉ
+        loadChatHistory();
+
+        const handleLogout = () => signOut(auth).then(() => location.reload());
+        btnAnon.replaceWith(btnAnon.cloneNode(true)); btnGoogle.replaceWith(btnGoogle.cloneNode(true));
+        document.querySelector('#auth-dropdown button:nth-of-type(1)').addEventListener('click', handleLogout);
+        document.querySelector('#auth-dropdown button:nth-of-type(2)').addEventListener('click', handleLogout);
+    } else {
+        currentUser = null;
+        userGmtElement.textContent = `Utilisateur (${userGmtString})`;
+        pPhoto.textContent = "👤"; pPhoto.style.backgroundImage = "none";
+        btnAnon.textContent = "Mode Anonyme"; btnAnon.style.display = "block";
+        btnGoogle.innerHTML = `S'authentifier avec Google`; btnGoogle.style.display = "flex";
+    }
+});
+
+// ==========================================
+// HORLOGE & INTERFACE
+// ==========================================
+let userGmtString = "GMT+3";
+function setupClockAndZone() {
+    const now = new Date();
+    const zoneName = now.toLocaleDateString('fr-FR', { timeZoneName: 'short' }).split(' ').pop();
+    document.getElementById('timezone-badge').textContent = zoneName;
+    const offset = -now.getTimezoneOffset() / 60;
+    userGmtString = `GMT${offset >= 0 ? '+' : ''}${offset}`;
+
+    function updateClock() {
+        document.getElementById('clock').textContent = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+    setInterval(updateClock, 1000); updateClock();
+    document.getElementById('welcome-time').textContent = `${now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} ${userGmtString}`;
+}
+
+const menuBtn = document.getElementById('profile-menu-btn');
+const authDropdown = document.getElementById('auth-dropdown');
+menuBtn.addEventListener('click', (e) => { e.stopPropagation(); authDropdown.classList.toggle('hidden'); });
+document.addEventListener('click', () => authDropdown.classList.add('hidden'));
+
+// ==========================================
+// GESTION DU CHAT ET FIRESTORE
+// ==========================================
+const BACKEND_URL = "/api/chat"; 
+const chatContainer = document.getElementById('chat-container');
+const userInput = document.getElementById('user-input');
+const sendBtn = document.getElementById('send-btn');
+const imageInput = document.getElementById('image-input');
+
+let selectedImageBase64 = null;
+let selectedMimeType = null;
+
+function scrollToBottom() { chatContainer.scrollTop = chatContainer.scrollHeight; }
+
+imageInput.addEventListener('change', function(e) {
+    const file = e.target.files[0]; if (!file) return;
+    selectedMimeType = file.type;
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+        selectedImageBase64 = evt.target.result.split(',')[1];
+        document.querySelector('label[for="image-input"]').classList.add('bg-blue-500/20', 'text-blue-400');
+    };
+    reader.readAsDataURL(file);
+});
+
+// Affiche un message à l'écran (avec une heure passée ou actuelle)
+function appendMessage(sender, text, imageSrc = null, timestamp = null) {
+    const messageTime = timestamp ? new Date(timestamp) : new Date();
+    const timeStr = `${messageTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} ${userGmtString}`;
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `flex gap-3 items-start max-w-[85%] ${sender === 'user' ? 'ml-auto flex-row-reverse' : ''}`;
+    let mediaHtml = imageSrc ? `<img src="${imageSrc}" class="max-w-xs max-h-48 rounded-xl mb-2 border border-white/10 shadow" />` : '';
+
+    if (sender === 'user') {
+        messageDiv.innerHTML = `
+            <div class="w-8 h-8 rounded-full bg-cyan-500 flex-shrink-0 flex items-center justify-center text-white text-xs font-bold shadow-md">U</div>
+            <div class="bg-blue-600 border border-blue-500 rounded-2xl rounded-tl-none p-3.5 shadow-xl text-white">
+                ${mediaHtml}
+                <p class="text-sm leading-relaxed">${text}</p>
+                <div class="flex items-center justify-end gap-1.5 mt-2 text-[10px] text-blue-200"><span>${timeStr}</span></div>
+            </div>`;
+    } else {
+        messageDiv.innerHTML = `
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 flex-shrink-0 flex items-center justify-center text-white text-xs font-bold shadow-md">W</div>
+            <div class="bg-slate-900/50 border border-white/5 rounded-2xl rounded-tl-none p-3.5 shadow-xl">
+                <p class="text-sm text-slate-100 leading-relaxed">${text}</p>
+                <div class="flex items-center justify-end gap-1.5 mt-2 text-[10px] text-slate-400"><span>${timeStr}</span></div>
+            </div>`;
+    }
+    chatContainer.appendChild(messageDiv);
+    scrollToBottom();
+}
+
+function toggleTypingIndicator(show) {
+    const existing = document.getElementById('typing-indicator');
+    if (!show && existing) { existing.remove(); return; }
+    if (show && !existing) {
+        const indicator = document.createElement('div');
+        indicator.id = 'typing-indicator'; indicator.className = 'flex gap-3 items-start max-w-[85%]';
+        indicator.innerHTML = `
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 flex-shrink-0 flex items-center justify-center text-white text-xs font-bold shadow-md">W</div>
+            <div class="bg-slate-900/30 border border-white/5 rounded-2xl rounded-tl-none py-3 px-4 shadow-xl flex items-center gap-1.5">
+                <span class="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0ms"></span>
+                <span class="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
+                <span class="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+            </div>`;
+        chatContainer.appendChild(indicator); scrollToBottom();
+    }
+}
+
+// FONCTION POUR SAUVEGARDER UN MESSAGE DANS FIRESTORE
+async function saveMessageToFirestore(sender, text, imageBase64 = null, mimeType = null) {
+    if (!currentUser) return; // Si pas connecté, on ne sauvegarde pas
+    try {
+        await addDoc(collection(db, "chats"), {
+            userId: currentUser.uid,
+            sender: sender,
+            text: text,
+            image: imageBase64, // Optionnel : Sauvegarde l'image en base64
+            mimeType: mimeType,
+            timestamp: Date.now()
+        });
+    } catch (e) {
+        console.error("Erreur d'écriture Firestore: ", e);
+    }
+}
+
+// FONCTION POUR CHARGER TOUS LES ANCIENS MESSAGES DE L'UTILISATEUR CONNECTÉ
+async function loadChatHistory() {
+    if (!currentUser) return;
+    
+    // Nettoyer l'écran d'affichage avant de recharger (sauf le message de bienvenue)
+    const welcomeMessage = chatContainer.firstElementChild;
+    chatContainer.innerHTML = '';
+    if (welcomeMessage) chatContainer.appendChild(welcomeMessage);
+
+    try {
+        const q = query(collection(db, "chats"), orderBy("timestamp", "asc"));
+        const querySnapshot = await getDocs(q);
+        
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            // Sécurité : Chaque utilisateur connecté ne voit que ses propres messages
+            if (data.userId === currentUser.uid) {
+                let imgUrl = data.image ? `data:${data.mimeType};base64,${data.image}` : null;
+                appendMessage(data.sender, data.text, imgUrl, data.timestamp);
+            }
+        });
+    } catch (e) {
+        console.error("Erreur de chargement d'historique : ", e);
+    }
+}
+
+window.handleSend = async function() {
+    const text = userInput.value.trim();
+    const hasImage = selectedImageBase64 !== null;
+    if (!text && !hasImage) return;
+
+    let localImgSrc = hasImage ? `data:${selectedMimeType};base64,${selectedImageBase64}` : null;
+    
+    // 1. Affichage local immédiat
+    appendMessage('user', text || "Photo envoyée", localImgSrc);
+    
+    // 2. Sauvegarde immédiate du message de l'user dans Firestore
+    await saveMessageToFirestore('user', text || "Photo envoyée", selectedImageBase64, selectedMimeType);
+
+    // Sauvegarde temporaire des données d'image pour l'envoi API
+    const imgBase64ToSend = selectedImageBase64;
+    const mimeTypeToSend = selectedMimeType;
+
+    userInput.value = '';
+    document.querySelector('label[for="image-input"]').classList.remove('bg-blue-500/20', 'text-blue-400');
+    toggleTypingIndicator(true);
+
+    const parts = [{ text: text || "Analyse cette image s'il te plaît" }];
+    if (hasImage) { parts.push({ inlineData: { mimeType: mimeTypeToSend, data: imgBase64ToSend } }); }
+
+    try {
+        const response = await fetch(BACKEND_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ parts })
+        });
+        const data = await response.json();
+        toggleTypingIndicator(false);
+
+        if (data.candidates && data.candidates[0].content.parts[0].text) {
+            const aiResponse = data.candidates[0].content.parts[0].text;
+            
+            // 3. Affichage de la réponse de l'IA
+            appendMessage('model', aiResponse);
+            // 4. Sauvegarde de la réponse de l'IA dans Firestore
+            await saveMessageToFirestore('model', aiResponse);
+        } else { 
+            appendMessage('model', "Désolé, l'IA n'a pas pu traiter cette demande."); 
+        }
+    } catch (error) {
+        console.error(error); toggleTypingIndicator(false);
+        appendMessage('model', "Erreur de communication avec le serveur Vercel.");
+    }
+    
+    selectedImageBase64 = null; selectedMimeType = null; imageInput.value = '';
+}
+
+sendBtn.addEventListener('click', window.handleSend);
+userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') window.handleSend(); });
+
+setupClockAndZone();
+    </script>
+</body>
+</html>
