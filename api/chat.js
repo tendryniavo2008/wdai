@@ -22,10 +22,9 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: "Clé API manquante sur Vercel." });
         }
 
-        // URL de l'API Gemini 1.5 Flash
-        const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+        // CORRECTION ICI : Passage à la version v1 stable pour gemini-1.5-flash
+        const GEMINI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
-        // Payload restructuré proprement pour correspondre aux attentes exactes de l'API Google
         const payload = {
             contents: [
                 {
@@ -43,7 +42,6 @@ export default async function handler(req, res) {
 
         const data = await response.json();
 
-        // Si l'API renvoie une erreur de clé ou de quota
         if (data.error) {
             return res.status(200).json({ 
                 candidates: [{ content: { parts: [{ text: `Erreur Google API : ${data.error.message} (Code: ${data.error.code})` }] } }] 
