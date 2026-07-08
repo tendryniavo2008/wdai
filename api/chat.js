@@ -22,8 +22,8 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: "Clé API manquante sur Vercel." });
         }
 
-        // CORRECTION ICI : Passage à la version v1 stable pour gemini-1.5-flash
-        const GEMINI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+        // NOUVELLE URL COMPATIBLE AVEC LES NOUVELLES CLÉS GOOGLE / FIREBASE
+        const GEMINI_URL = `https://firebasevertexai.googleapis.com/v1beta/projects/worldai-4ec87/locations/us-central1/publishers/google/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
         const payload = {
             contents: [
@@ -42,9 +42,10 @@ export default async function handler(req, res) {
 
         const data = await response.json();
 
+        // Gestion des erreurs serveurs
         if (data.error) {
             return res.status(200).json({ 
-                candidates: [{ content: { parts: [{ text: `Erreur Google API : ${data.error.message} (Code: ${data.error.code})` }] } }] 
+                candidates: [{ content: { parts: [{ text: `Erreur Configuration API : ${data.error.message}` }] } }] 
             });
         }
 
